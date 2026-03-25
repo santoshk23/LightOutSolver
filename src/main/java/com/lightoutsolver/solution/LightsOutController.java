@@ -50,7 +50,7 @@ public class LightsOutController {
                 .retrieve()
                 .bodyToMono(SubmitSolutionResponse.class)
                 .doOnSuccess(res -> log.info("Solution submitted successfully: {}",
-                        res.getData().getMessage()))
+                        res.getData()))
                 .doOnError(e -> log.error("Error submitting solution: {}", e.getMessage()))
                 .block();
 
@@ -58,7 +58,7 @@ public class LightsOutController {
             throw new RuntimeException("No response from solution endpoint");
         }
 
-        log.info("Final result: {}", submitResponse.getData().getMessage());
+        log.info("Final result: {}", submitResponse.getData());
         log.info("Solved at: {}", submitResponse.getData().getSolvedAt());
 
         return submitResponse;

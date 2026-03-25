@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Slf4j
 @RestController
@@ -87,14 +88,20 @@ public class LightsOutControllerNew {
     }
 
     private SubmitSolutionResponse submitSolution(WebClient webClient, SolveResponse solveResponse) {
-        SubmitSolutionResponse submitResponse = webClient.post()
-                .uri(SOLUTION_ENDPOINT)
-                .bodyValue(solveResponse)
-                .retrieve()
-                .bodyToMono(SubmitSolutionResponse.class)
-                .doOnSuccess(res -> log.info("Solution accepted: {}", res.getData().getMessage()))
-                .doOnError(e -> log.error("Error submitting solution: {}", e.getMessage()))
-                .block();
+        SubmitSolutionResponse submitResponse = null;
+        try {
+            submitResponse = webClient.post()
+                    .uri(SOLUTION_ENDPOINT)
+                    .bodyValue(solveResponse)
+                    .retrieve()
+                    .bodyToMono(SubmitSolutionResponse.class)
+                    .doOnSuccess(res -> log.info("Solution accepted: {}", res.getData()))
+                    //.doOnError(e -> log.error("Error submitting solution: {}", e.getMessage()))
+                    .block();
+        }
+        catch (WebClientResponseException e){
+            log.warn("Response Body "+e.getResponseBodyAsString());
+        }
 
         if (submitResponse == null) {
             throw new RuntimeException("No response from solution endpoint");

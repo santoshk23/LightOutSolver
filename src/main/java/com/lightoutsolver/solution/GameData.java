@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameData {
+    private String competitionId;
     private String gameId;
     private String teamId;
     private String gameType;
